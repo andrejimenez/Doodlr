@@ -51,14 +51,12 @@ tmpFloatArr = 0
 tmpBoolArr = 0
 
 funciones.append(EstrucFunc("CONST","VOID",1))
-#funciones[0].varTable.append(Var("-1","INT",17500,None))
-#cInt += 1
 funciones.append(EstrucFunc("GLOBAL","VOID",1))
 
 
 # Definicion de inicio de programa
-def p_prog(p):
-	'prog : startQuad globFunc changeScope DecFun PR_main fillMainQuad TO_BRACKOP setMainFuncionValores mainBlock TO_BRACKCLO end' 
+def p_programa(p):
+	'programa : startQuad varGlobales cambiaScope declaraFunciones PR_main fillMainQuad TO_BRACKOP setMainFuncionValores mainBloque TO_BRACKCLO endPrograma'
 
 #Crea el cuadruplo que dirige al MAIN
 def p_startQuad(p):
@@ -74,29 +72,29 @@ def p_fillMainQuad(p):
 
 
 #Crea el cuadrupLo de cierre del programa
-def p_end(p):
-	'end : '
+def p_endPrograma(p):
+	'endPrograma : '
 	cuadruplos.append(cuadruplo(len(cuadruplos), "END", None, None, None))
 
 #El scope cambia, para así saber si trabajamos con variables globales o locales
-def p_changeScope(p):
-	'changeScope : '
+def p_cambiaScope(p):
+	'cambiaScope : '
 	global scope
 	scope = 0
 
 
 #Definicion de bloque de declaracion de variables globales
-def p_globFunc(p):
-	'''globFunc : PR_global decVar globFunc
+def p_varGlobales(p):
+	'''varGlobales : PR_global defVariables varGlobales
 			| empty'''
 
 #Definicion de bloque de declaracion de variables Funciones
-def p_DecFun(p):
-	'''DecFun : PR_function fun DecFun
+def p_declaraFunciones(p):
+	'''declaraFunciones : PR_function defFuncion declaraFunciones
 			| empty'''
 
-def p_fun(p):
-	'fun : tipo ID agregaFuncion TO_PAROP param2 TO_PARCLO TO_BRACKOP mainBlock return TO_BRACKCLO endProcCuad'
+def p_defFuncion(p):
+	'defFuncion : decTipo ID agregaFuncion TO_PAROP decParametros TO_PARCLO TO_BRACKOP mainBloque funcReturn TO_BRACKCLO endProcCuad'
 
 def p_agregaFuncion(p):
 	'''agregaFuncion : '''
@@ -121,19 +119,19 @@ def p_endProcCuad(p):
 	cuadruplos.append(cuadruplo(len(cuadruplos), 'EndProc', None, None , None))
 
 
-def p_param2(p):
-	'''param2 : tipo ID meteVariable
-	         | tipo ID meteVariable TO_COMA param2'''
+def p_decParametros(p):
+	'''decParametros : decTipo ID meteVariable
+	         | decTipo ID meteVariable TO_COMA decParametros'''
 
 #Definicion de un bloque de codigo basico
-def p_mainBlock(p):
-	'''mainBlock : changeScope ciclos mainBlock
-	 		| condicionales mainBlock
-	 		| decVar mainBlock
-	 		| llamadaDeFunciones mainBlock
-	 		| igual mainBlock
-	 		| write mainBlock
-	 		| read mainBlock
+def p_mainBloque(p):
+	'''mainBloque : cambiaScope funcCiclos mainBloque
+	 		| funcIf mainBloque
+	 		| defVariables mainBloque
+	 		| llamadaDeFunciones mainBloque
+	 		| funcIgual mainBloque
+	 		| funcWrite mainBloque
+	 		| funcRead mainBloque
 			| empty'''
 
 
@@ -148,83 +146,65 @@ def p_setMainFuncionValores(p):
 	lBool = 0
 
 #Define Write
-def p_write(p):
-	'write : PR_write TO_PAROP  ID AgregaCuadWrite TO_PARCLO TO_PuntoComa'
+def p_funcWrite(p):
+	' funcWrite : PR_write TO_PAROP  ID agregaWriteCuad TO_PARCLO TO_PuntoComa'
 
 #Define Read
-def p_read(p):
-	'read : PR_read TO_PAROP ID AgregaCuadRead TO_PARCLO TO_PuntoComa'
+def p_funcRead(p):
+	' funcRead : PR_read TO_PAROP ID agregaReadCuad TO_PARCLO TO_PuntoComa'
 
 #Define Return
-def p_return(p):
-	'return : PR_return TO_PAROP ID AgregaCuadRet TO_PARCLO TO_PuntoComa'
+def p_funcReturn(p):
+	' funcReturn : PR_return TO_PAROP ID agregaReturnCuad TO_PARCLO TO_PuntoComa'
 
 # Definicion de asignacion
-def p_igual(p):
-	''' igual : ID AgregaVar OP_EQUALS AgregaOpp superExp TO_PuntoComa AgregaCuadIgual
-			  | ID TO_CBRACKOP superExp TO_CBRACKCLO OP_EQUALS superExp cuadruploAsignaArr TO_PuntoComa AgregaCuadIgual'''
+def p_funcIgual(p):
+	''' funcIgual : ID pushPilaVar OP_EQUALS pushPilaOp defExpresiones TO_PuntoComa agregaIgualCuad
+			  | ID TO_CBRACKOP defExpresiones TO_CBRACKCLO OP_EQUALS defExpresiones cuadruploAsignaArr TO_PuntoComa agregaIgualCuad'''
 
 # Definicion de ciclos WHILE
-def p_ciclo(p):
-	' ciclos :  PR_While  TO_PAROP superExp IfQuad1 TO_PARCLO IfQuad1 TO_BRACKOP mainBlock IfQuad3 TO_BRACKCLO '
+def p_funcCiclos(p):
+	' funcCiclos : PR_While TO_PAROP defExpresiones TO_PARCLO agregaIfCuadP1 TO_BRACKOP mainBloque agregaIfCuadP2 TO_BRACKCLO '
 
 
 #Declaracion de Condicionales/ if y else
 #Definicion de condicional if
-def p_condicionales (p):
-	' condicionales : PR_if TO_PAROP superExp TO_PARCLO IfQuad1 TO_BRACKOP mainBlock TO_BRACKCLO else IfQuad3'
+def p_funcIf(p):
+	' funcIf : PR_if TO_PAROP defExpresiones TO_PARCLO agregaIfCuadP1 TO_BRACKOP mainBloque TO_BRACKCLO funcElse agregaIfCuadP3'
 
 #Definicion de condicional else
-def p_else (p):
-	''' else :  IfQuad2 PR_else TO_BRACKOP  mainBlock TO_BRACKCLO
+def p_funcElse(p):
+	''' funcElse : agregaIfCuadP2 PR_else TO_BRACKOP  mainBloque TO_BRACKCLO
 		| empty'''
-def p_WhileQuad1(p):
-	'WhileQuad1 : '
-	idx = pilaSaltos.pop()
-	cuadruplos[idx].var3 = len(cuadruplos)
-
-# guardar indice de cuadruplo del GotoF
-def p_WhileQuad2(p):
-	'WhileQuad2 : '
-	pilaSaltos.append(len(cuadruplos))
-	cuadruplos.append(cuadruplo(len(cuadruplos), "GotoF", getDireccionMem(pilaVar.pop()), None, None))
-
-
-def p_WhileQuad3(p):
-	'WhileQuad3 : '
-	idx = pilaSaltos.pop()
-	pilaSaltos.append(len(cuadruplos))
-	cuadruplos.append(cuadruplo(len(cuadruplos), "Goto", None, None, None))
-	cuadruplos[idx].var3 = len(cuadruplos)
 
 #Declaracion de Variables , Arreglos
 
-def p_tipo(p):
-	''' tipo : PR_int
+def p_decTipo(p):
+	''' decTipo : PR_int
 	         | PR_float
 	         | PR_bool
 	         | PR_void
 	        '''
 	p[0] = p[1]
 
-def p_decVar (p):
- 	''' decVar : PR_int  tipoVar decVar1 TO_PuntoComa
-	         | PR_float  tipoVar decVar1 TO_PuntoComa
-	         | PR_bool  tipoVar decVar1 TO_PuntoComa
-	         | PR_void  tipoVar decVar1 TO_PuntoComa
+def p_defVariables(p):
+ 	''' defVariables : PR_int  tipoVar defVar1 TO_PuntoComa
+	         | PR_float  tipoVar defVar1 TO_PuntoComa
+	         | PR_bool  tipoVar defVar1 TO_PuntoComa
+	         | PR_void  tipoVar defVar1 TO_PuntoComa
 	        '''
 
-def p_decVar1 (p):
- 	''' decVar1 : var decMasVar
- 			 	| arreglo decMasVar '''
+def p_defVar1(p):
+ 	''' defVar1 : variable defVar2
+ 			 	| arreglo defVar2 '''
 
-def p_decMasVar (p):
- 	''' decMasVar :  TO_COMA decVar1
+def p_defVar2(p):
+ 	''' defVar2 : TO_COMA defVar1
  			 	| empty '''
 
 #Declaracion de variables
-def p_var(p):
- 	'var : ID meteVariable'
+def p_variable(p):
+ 	' variable : ID meteVariable'
 
 # meter tipo de var
 def p_tipoVar(p):
@@ -281,55 +261,55 @@ def p_escribeArr(p):
 ##################################################
 
 
-def p_superExp(p):
-	'''superExp : Exp
-	  			| Exp  PR_and AgregaOpp superExp AgregaCuadAnd
-	  			| Exp  PR_or AgregaOpp superExp AgregaCuadAnd'''
+def p_defExpresiones(p):
+	'''defExpresiones : decExpresion
+	  			| decExpresion PR_and pushPilaOp defExpresiones agregaAndCuad
+	  			| decExpresion PR_or pushPilaOp defExpresiones agregaAndCuad'''
 	p[0] = p[1]
 
-def p_Exp(p):
-	''' Exp : miniExp
-	    | miniExp OP_EQUALTO AgregaOpp miniExp AgregaCuadComp
-	    | miniExp OP_DIFF AgregaOpp  miniExp AgregaCuadComp
-        | miniExp OP_LESST AgregaOpp  miniExp AgregaCuadComp
-        | miniExp OP_LESSTEQ AgregaOpp miniExp AgregaCuadComp
-        | miniExp OP_GREATT AgregaOpp  miniExp AgregaCuadComp
-        | miniExp OP_GREATTEQ AgregaOpp miniExp AgregaCuadComp '''
+def p_decExpresion(p):
+	''' decExpresion : miniExp
+	    | miniExp OP_EQUALTO pushPilaOp miniExp agregaComparCuad
+	    | miniExp OP_DIFF pushPilaOp  miniExp agregaComparCuad
+        | miniExp OP_LESST pushPilaOp  miniExp agregaComparCuad
+        | miniExp OP_LESSTEQ pushPilaOp miniExp agregaComparCuad
+        | miniExp OP_GREATT pushPilaOp  miniExp agregaComparCuad
+        | miniExp OP_GREATTEQ pushPilaOp miniExp agregaComparCuad '''
 	p[0] = p[1]
 
 def p_miniExp(p):
 	''' miniExp : microExp
-	 			| microExp OP_SUBS AgregaOpp miniExp AgregaCuadSR
-	 			| microExp OP_ADD AgregaOpp miniExp  AgregaCuadSR'''
+	 			| microExp OP_SUBS pushPilaOp miniExp agregaSumResCuad
+	 			| microExp OP_ADD pushPilaOp miniExp  agregaSumResCuad'''
 	p[0] = p[1]
 
 def p_microExp (p):
 	''' microExp : micromicroExp
-			     | micromicroExp OP_MULT AgregaOpp microExp AgregaCuadMD
-	 		     | micromicroExp OP_DIV AgregaOpp microExp AgregaCuadMD
-	 		     | micromicroExp OP_MOD AgregaOpp microExp AgregaCuadMD'''
+			     | micromicroExp OP_MULT pushPilaOp microExp agregaMultDivCuad
+	 		     | micromicroExp OP_DIV pushPilaOp microExp agregaMultDivCuad
+	 		     | micromicroExp OP_MOD pushPilaOp microExp agregaMultDivCuad'''
 	p[0] = p[1]
 
 def p_micromicroExp(p):
-	''' micromicroExp :  sol
-					  | sol OP_POW AgregaOpp micromicroExp AgregaCuadPow'''
+	''' micromicroExp : decSolucion
+					  | decSolucion OP_POW pushPilaOp micromicroExp agregaPowCuad'''
 	p[0] = p[1]
 
-def p_sol(p):
-	''' sol : ID AgregaVar
-			| ID TO_CBRACKOP superExp TO_CBRACKCLO cuadArrPush
-			| TO_INT CuadInt
-			| TO_FLOAT CuadFloat
-			| PR_true CuadBool
-			| PR_false CuadBool
+def p_decSolucion(p):
+	''' decSolucion : ID pushPilaVar
+			| ID TO_CBRACKOP defExpresiones TO_CBRACKCLO cuadArrPush
+			| TO_INT agregaIntCuad
+			| TO_FLOAT agregaFloatCuad
+			| PR_true agregaBoolCuad
+			| PR_false agregaBoolCuad
 			| llamadaDeFunciones
-			| TO_PAROP AgregaOpp superExp TO_PARCLO AgregaOpp  '''
+			| TO_PAROP pushPilaOp defExpresiones TO_PARCLO pushPilaOp  '''
 	p[0] = p[1]
 
 
 # llamada de fuciones
 def p_llamadaDeFunciones(p):
-	''' llamadaDeFunciones : ID eraCuadruplo TO_PAROP param TO_PARCLO TO_PuntoComa goSubCuadruplo
+	''' llamadaDeFunciones : ID eraCuadruplo TO_PAROP decParamFuncs TO_PARCLO TO_PuntoComa goSubCuadruplo
 							| funcionesDibuja
 							| empty'''
 
@@ -340,36 +320,39 @@ def p_funcionesDibuja(p):
                         | PR_estrella TO_PAROP ID TO_COMA ID TO_COMA ID TO_PARCLO TO_PuntoComa estrellaCuad'''
 
 
-def p_param(p):
-	''' param : ID paramCuadruplo
-	    	 | ID paramCuadruplo TO_COMA param
+def p_decParamFuncs(p):
+	''' decParamFuncs : ID paramCuadruplo
+	    	 | ID paramCuadruplo TO_COMA decParamFuncs
 	    	 | empty '''
 
+
+########################## PILAS ################################
+
 # Agrega operadores a la pila de operadores
-def p_AgregaOpp(p):
-	'AgregaOpp : empty'
+def p_pushPilaOp(p):
+	'pushPilaOp : empty'
 	pilaOpp.append(p[-1]) #p[-1 ] quieredecir que se ira a la instrucion de atras menos 1 es decir se ira al operador
 
 
 # Agrega Variables a la pila de Variables
-def p_AgregaVar(p):
-	'AgregaVar : empty'
+def p_pushPilaVar(p):
+	'pushPilaVar : empty'
 	pilaVar.append(p[-1])
 
-########################## CUADRUPLOS TIPO VARIABLES ################################
+########################## PILAS TIPO VARIABLES ################################
 
-def p_CuadInt(p):
-	'CuadInt : empty '
+def p_agregaIntCuad(p):
+	'agregaIntCuad : empty '
 	pilaVar.append(p[-1])
 	funciones[0].varTable.append(Var(p[-1], 'INT', getDirecConstantes('INT'),None))
 
-def p_CuadFloat(p):
-	'CuadFloat : empty '
+def p_agregaFloatCuad(p):
+	'agregaFloatCuad : empty '
 	pilaVar.append(p[-1])
 	funciones[0].varTable.append(Var(p[-1], 'FLOAT', getDirecConstantes('FLOAT'),None))
 
-def p_CuadBool(p):
-	'CuadBool : empty '
+def p_agregaBoolCuad(p):
+	'agregaBoolCuad : empty '
 	pilaVar.append(p[-1])
 	funciones[0].varTable.append(Var(p[-1], 'BOOL', getDirecConstantes('BOOL'),None))
 
@@ -379,7 +362,7 @@ def p_CuadruploArrpush(p):
     "cuadArrPush : empty"
     # metemos en la lista de cuadruplos la verificacion de 0 a valor-1 o int(getDimensionVar(p[-4]))-1 y lo guardamos en un espacio de memoria
     cuadruplos.append(cuadruplo(len(cuadruplos), 'Ver' ,0, int(getDimensionVar(p[-4]))-1 , getDireccionMem(p[-2])))
-    print("EL DIM " + str(getDimensionVar(p[-4])) )
+    #print("EL DIM " + str(getDimensionVar(p[-4])) )
 
     global temporalContador
     numTemporal = "t" + str(temporalContador)
@@ -399,8 +382,8 @@ def p_CuadruploArrpush(p):
 
 ########################## CUADRUPLOS COMPARACION ################################
 
-def p_AgregaCuadAnd(p):
-	'AgregaCuadAnd : '
+def p_agregaAndCuad(p):
+	'agregaAndCuad : '
 	if len(pilaOpp)> 0:
 		global temporalContador
 		if pilaOpp[len(pilaOpp)-1] == 'OR' or pilaOpp[len(pilaOpp)-1] == 'AND':
@@ -423,8 +406,8 @@ def p_AgregaCuadAnd(p):
 			temporalContador = temporalContador + 1
 
 
-def p_AgregaCuadComp(p):
-	'AgregaCuadComp : '
+def p_agregaComparCuad(p):
+	' agregaComparCuad : '
 	if len(pilaOpp)> 0:
 		global temporalContador
 		if pilaOpp[len(pilaOpp)-1] == '<' or pilaOpp[len(pilaOpp)-1] == '>'  or pilaOpp[len(pilaOpp)-1] == '<=' or pilaOpp[len(pilaOpp)-1] == '=>' or pilaOpp[len(pilaOpp)-1] == '==' or pilaOpp[len(pilaOpp)-1] == '!=':
@@ -449,8 +432,8 @@ def p_AgregaCuadComp(p):
 
 ########################## CUADRUPLOS ARITMETICOS ################################
 
-def p_AgregaCuadSR(p):
-	'AgregaCuadSR : '
+def p_agregaSumResCuad(p):
+	'agregaSumResCuad : '
 	if len(pilaOpp)> 0:
 		global temporalContador
 		if pilaOpp[len(pilaOpp)-1] == '+' or pilaOpp[len(pilaOpp)-1] == '-':
@@ -472,8 +455,8 @@ def p_AgregaCuadSR(p):
 			pilaVar.append(varT)
 			temporalContador = temporalContador + 1
 
-def p_AgregaCuadMD(p):
-	'AgregaCuadMD : '
+def p_agregaMultDivCuad(p):
+	'agregaMultDivCuad : '
 	if len(pilaOpp)> 0:
 		global temporalContador
 		if pilaOpp[len(pilaOpp)-1] == '*' or pilaOpp[len(pilaOpp)-1] == '/' or pilaOpp[len(pilaOpp)-1] == '%':
@@ -495,8 +478,8 @@ def p_AgregaCuadMD(p):
 			pilaVar.append(varT)
 			temporalContador = temporalContador + 1
 
-def p_AgregaCuadPow(p):
-	'AgregaCuadPow : '
+def p_agregaPowCuad(p):
+	'agregaPowCuad : '
 	if len(pilaOpp)> 0:
 		global temporalContador
 		if pilaOpp[len(pilaOpp)-1] == '^' :
@@ -519,8 +502,8 @@ def p_AgregaCuadPow(p):
 			temporalContador = temporalContador + 1
 
 
-def p_AgregaCuadIgual(p):
-	'AgregaCuadIgual : '
+def p_agregaIgualCuad(p):
+	'agregaIgualCuad : '
 	ID = p[-6]
 	if len(pilaOpp)> 0:
 		if pilaOpp[len(pilaOpp)-1] == '=' :
@@ -564,47 +547,51 @@ def p_CuadruploAsignaARR(p):
             cuadruplos.append(cuadruplo(len(cuadruplos), '+ARR' ,getDireccionMem(p[-7]), getDireccionMem(p[-5]), getDireccionMem(numTemporal)))
             cuadruplos.append(cuadruplo(len(cuadruplos), '=', dirVariable, None,  getDireccionMem(numTemporal)))
 
-def p_AgregaCuadWrite(p):
-	'AgregaCuadWrite : '
+########################## CUADRUPLOS INSTRUCCIONES ################################
+
+def p_agregaWriteCuad(p):
+	'agregaWriteCuad : '
 	ID = p[-1]
 	dirID = getDireccionMem(ID)
 	cuadruplos.append(cuadruplo(len(cuadruplos), 'Write',dirID, None , None))
 
 
-def p_AgregaCuadRead(p):
-	'AgregaCuadRead : '
+def p_agregaReadCuad(p):
+	'agregaReadCuad : '
 	ID = p[-1]
 	dirID = getDireccionMem(ID)
 	cuadruplos.append(cuadruplo(len(cuadruplos), 'Read',dirID, None , None))
 
-def p_AgregaCuadRet(p):
-	'AgregaCuadRet : '
+def p_agregaReturnCuad(p):
+	'agregaReturnCuad : '
 	ID = p[-1]
 	dirID = getDireccionMem(ID)
 	cuadruplos.append(cuadruplo(len(cuadruplos), 'Return',dirID, None , None))
 
-def p_IfQuad1(p):
-	'IfQuad1 : '
+########################## CUADRUPLOS CONDICIONALES Y CICLOS ################################
+
+def p_agregaIfCuadP1(p):
+	' agregaIfCuadP1 : '
 	pilaSaltos.append(len(cuadruplos))
 	cuadruplos.append(cuadruplo(len(cuadruplos), "GotoF", getDireccionMem(pilaVar.pop()), None, None))
 
-def p_IfQuad2(p):
-	'IfQuad2 : '
+def p_agregaIfCuadP2(p):
+	' agregaIfCuadP2 : '
 	idx = pilaSaltos.pop()
 	pilaSaltos.append(len(cuadruplos))
 	cuadruplos.append(cuadruplo(len(cuadruplos), "Goto", None, None, None))
 	cuadruplos[idx].var3 = len(cuadruplos)
 
-def p_IfQuad3(p):
-	'IfQuad3 : '
-	idx = pilaSaltos.pop()
-	cuadruplos[idx].var3 = len(cuadruplos)
+def p_agregaIfCuadP3(p):
+	' agregaIfCuadP3 : '
+	idSaltos = pilaSaltos.pop()
+	cuadruplos[idSaltos].var3 = len(cuadruplos)
 
 # guardar indice de cuadruplo donde se empieza la condicion del while
 def p_WhileQuad1(p):
 	'WhileQuad1 : '
-	idx = pilaSaltos.pop()
-	cuadruplos[idx].var3 = len(cuadruplos)
+	idSaltos = pilaSaltos.pop()
+	cuadruplos[idSaltos].var3 = len(cuadruplos)
 
 # guardar indice de cuadruplo del GotoF
 def p_WhileQuad2(p):
@@ -618,6 +605,9 @@ def p_WhileQuad3(p):
 	pilaSaltos.append(len(cuadruplos))
 	cuadruplos.append(cuadruplo(len(cuadruplos), "Goto", None, None, None))
 	cuadruplos[idx].var3 = len(cuadruplos)
+
+
+########################## CUADRUPLOS FUNCIONES ################################
 
 # obtiene parametros
 def p_paramCuadruplo(p):
@@ -679,7 +669,7 @@ def p_estrellaCuad(p):
     cuadruplos.append(cuadruplo(len(cuadruplos), 'Estrella', vertices, step, largo))
     #cuadruplos.append(cuadruplo(len(cuadruplos), 'estrella2', color, None, None, None))
 
-
+########################## FUNCIONES ################################
 
 # FUNCIONES BUSQUEDA
 def getFuncion(ID):
@@ -721,14 +711,14 @@ def getDireccionMem(ID):
 	varGlobales = list(map(lambda x: x.id ,funciones[1].varTable))
 	varConstant = list(map(lambda x: x.id ,funciones[0].varTable))
 	if ID in varLocales:
-		idT = varLocales.index(ID)
-		return funciones[scope].varTable[idT].dir
+		idx = varLocales.index(ID)
+		return funciones[scope].varTable[idx].dir
 	elif ID in varGlobales:
-	    idT  = varGlobales.index(ID)
-	    return funciones[1].varTable[idT].dir
+	    idx  = varGlobales.index(ID)
+	    return funciones[1].varTable[idx].dir
 	elif ID in varConstant:
-		idT = varConstant.index(ID)
-		return funciones[0].varTable[idT].dir
+		idx = varConstant.index(ID)
+		return funciones[0].varTable[idx].dir
 	return False
 
 def getDirecTipoVar(ID):
@@ -745,6 +735,22 @@ def getDirecTipoVar(ID):
 		idx = varConstant.index(ID)
 		return funciones[0].varTable[idx].type
 	return False
+
+def getDimensionVar(ID):
+	varLocales = list(map(lambda x: x.id ,funciones[scope].varTable))
+	varGlobales = list(map(lambda x: x.id ,funciones[1].varTable))
+	varConstant = list(map(lambda x: x.id ,funciones[0].varTable))
+	if ID in varLocales:
+		idx = varLocales.index(ID)
+		return funciones[scope].varTable[idx].dim
+	elif ID in varGlobales:
+	    idx  = varGlobales.index(ID)
+	    return funciones[1].varTable[idx].dim
+	elif ID in varConstant:
+		idx = varConstant.index(ID)
+		return funciones[0].varTable[idx].dim
+	return False
+
 
 def getDirecTemporales(varType):
     DireTemp = 0
@@ -823,6 +829,7 @@ if aprobado == True:
 	print ("\nCuadruplos:")
 	for i in range(0, len(cuadruplos)):
 		print(str(cuadruplos[i]))
+
 
 	sys.exit()
 else:
