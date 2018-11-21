@@ -1,0 +1,28 @@
+MAIN {
+INT n, x1, x2, temp, next;
+
+n=5;
+x1 = 1;
+x2 = 1;
+temp = 1;
+next = 0;
+
+WHILE (temp <= n) {
+
+  IF(temp == 1) {
+	WRITE (x1);
+   }
+
+  IF(temp == 2) {
+    WRITE (x2);
+  }
+
+  IF(temp > 2) {
+    next = x1 + x2;
+    x1 = x2;
+    x2 = next;
+    WRITE (next);
+  }
+  temp = temp + 1;
+ }
+}

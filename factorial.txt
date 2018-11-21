@@ -1,0 +1,20 @@
+FUNCTION INT factorial(INT n) {
+  INT ret;
+  INT i;
+  ret = 1;
+  i = n;
+  WHILE (i > 0) {
+    ret = ret * i;  
+  }
+  RETURN ret;
+}
+
+MAIN {
+INT a;
+a = 1;
+
+WHILE (a < 5) {
+WRITE (factorial(a));
+a = a + 1;
+  }
+}

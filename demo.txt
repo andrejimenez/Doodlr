@@ -1,0 +1,27 @@
+GLOBAL INT p;
+
+
+FUNCTION VOID intento(INT n) {
+ n=1;
+}
+
+
+MAIN {
+
+
+BOOL x;
+
+BOOL y;
+
+INT z[3];
+p = 1;
+z[1]=1;
+
+
+ IF(p<1) {
+} ELSE{
+}
+
+intento(p);
+
+}
