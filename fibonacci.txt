@@ -1,0 +1,33 @@
+MAIN {
+
+INT n;
+INT x1;
+INT x2;
+INT temp;
+INT next;
+
+n = 5;
+x1 = 1;
+x2 = 1;
+temp = 1;
+next = 0;
+
+WHILE (temp <= n) {
+
+  IF(temp == 1) {
+
+   }
+
+  IF(temp == 2) {
+
+  }
+
+  IF(temp > 2) {
+    next = x1 + x2;
+    x1 = x2;
+    x2 = next;
+
+  }
+  temp = temp + 1;
+ }
+}

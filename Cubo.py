@@ -43,6 +43,7 @@ charToEnum = {
     "BOOL" : Type.BOOL,
     "err" : Type.ERROR
 }
+
 def getCubeType(typ1,typ2,act):
     return cubo[charToEnum[typ1]][charToEnum[typ2]][charToEnum[act]]
 

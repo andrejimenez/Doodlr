@@ -1,0 +1,30 @@
+GLOBAL INT p;
+
+FUNCION INT intento(INT x) {
+
+INT k;
+k=1;
+WRITE(k);
+}
+
+MAIN {
+
+
+BOOL x;
+
+BOOL y;
+
+INT z[3];
+p = 1;
+z[1]=1;
+
+
+ IF(p<1) {
+
+} ELSE{
+
+}
+
+intento(p);
+
+}

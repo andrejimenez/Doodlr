@@ -20,6 +20,8 @@ class maquinavirtual():
         self.cuadruploActual = 0
         self.regresaCuadruplo = []
         self.regresaDireccion = []
+        self.tmptemporales = []
+        self.tmplocales = []
 
         self.memoria = memoriaVirtual()
         
@@ -27,6 +29,8 @@ class maquinavirtual():
             self.memoria.colocarValores(self.funciones.funciones[i])
 
         self.parametros = []
+        self.memAux = self.memoria
+        self.meterParametros(self.memAux)
 
     def goto(self,cuadruplos):
         self.cuadruploActual = cuadruplos.var3-1
@@ -36,12 +40,22 @@ class maquinavirtual():
         if not var1:
             self.cuadruploActual = cuadruplos.var3-1
 
+    def era(self, cuadruplos):
+        self.regresaDireccion.append(cuadruplos.var1)
+
     def goSub(self,cuadruplos):
         begin = cuadruplos.var1
         self.regresaCuadruplo.append(self.cuadruploActual)
+        self.tmptemporales.append(self.memoria.mTemporales)
+        self.tmplocales.append(self.memoria.mLocales)
+        self.memAux = memoriaVirtual()
+        self.memAux.mConstante = self.memoria.mConstante
+        self.memAux.mGlobal = self.memoria.mGlobal
+        self.meterParametros(self.memoria)
         self.run(begin,'EndProc')
-        #print(str(begin = cuadruplos.var1))
-        self.cuadActual = self.regresaCuadruplo.pop()
+        self.memAux.mTemporales = self.tmptemporales.pop()
+        self.memAux.mLocales = self.tmplocales.pop()
+        self.cuadruploActual = self.regresaCuadruplo.pop()
 
     def param(self,cuadruplos,memoria):
         valor = memoria.obtenerValor(cuadruplos.var1)
@@ -50,9 +64,11 @@ class maquinavirtual():
         self.parametros.append(param)
     
     def ret(self,cuadruplos,memoria):
-        value = memoria.getValue(var.var1)
-        dir = self.regresaDireccion.pop()
-        memoria.setValue(value,dir)
+        value = memoria.obtenerValor(cuadruplos.var1)
+        #print(str(self.regresaDireccion))
+        dir = self.memoria.obtenerValor(cuadruplos.var1)
+        memoria.meterValor(value,dir)
+
     
     def verifica(self,cuadruplos,memoria):
         var1 = cuadruplos.var1
@@ -61,9 +77,6 @@ class maquinavirtual():
         value = memoria.fixType(cuadruplos.var3, value)
         if not value<var1 and value>var2:
             print('No cabe')
-    
-    def era(self, cuadruplos):
-        self.regresaDireccion.append(cuadruplos.var1)
     
 
     def ARRDef(self,cuadruplos,memoria):
@@ -275,7 +288,27 @@ class maquinavirtual():
             tur.right(vStep*360.0/vVertices)
         turtle.done()
 
-
+    def meterParametros(self, memoria):
+        self.parametros.reverse()
+        cInt = 0
+        cFloat = 0
+        cBool = 0
+        cRad = 0
+        cDegree = 0
+        while self.parametros:
+            tmp = self.parametros.pop()
+            valor = tmp.value
+            varType = tmp.type
+            if varType == 'INT':
+                dir = 8500 + cInt
+                cInt = cInt +1
+            elif varType == 'FLOAT':
+                dir = 9500 + cFloat
+                cFloat = cFloat +1
+            elif varType == 'BOOL':
+                dir = 10500 + cBool
+                cBool= cBool +1
+            memoria.meterValor(valor, dir)
 
 
     def run(self,begin,end):
@@ -285,8 +318,8 @@ class maquinavirtual():
 
         for i in range(2,len(self.funciones.funciones)):
             memoria.colocarValores(self.funciones.funciones[i])
-        self.cuadruploActual = begin    
-        
+        self.cuadruploActual = begin
+
         while self.cuadruplos[self.cuadruploActual].estatuto != end:
             cuadruplo = self.cuadruplos[self.cuadruploActual]
             print(cuadruplo)
@@ -321,8 +354,7 @@ class maquinavirtual():
 
             elif accion == 'Write':
                 self.despliega(cuadruplo, memoria)
-            
-            
+                    
             elif accion == '+' or accion == '-' or accion == '*':
                 self.opMatematica(cuadruplo,memoria)
 

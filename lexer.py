@@ -30,7 +30,6 @@ reservedWords = {
 	  'RECTANGULO' : 'PR_rectangulo',
 	  'ESPIRAL' : 'PR_espiral',
 	  'ESTRELLA' : 'PR_estrella',
-	  'SUPERESTRELLA' : 'PR_superEstrella'
 }
 
 #Tokens validos
