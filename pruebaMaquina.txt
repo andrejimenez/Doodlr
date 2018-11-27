@@ -18,19 +18,22 @@ INT c;
 INT d[10];
 INT e[5];
 
+intento(a);
+
 a = 360;
-b = 60;
+b = 59;
 c = 10;
 
-e[3] = 360;
-e[4] = 59;
-e[5] = 10;
+e[3] = 4;
+e[4] = 60;
+e[5] = 5;
 
 ESPIRAL(a,b,c);
 
-intento(a);
 
 IF (c == 2) {
+
+} ELSE {
 
 }
 

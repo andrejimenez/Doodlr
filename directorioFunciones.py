@@ -7,8 +7,12 @@ TIPO = "tipo"
 
 #clase que guarda todas las funciones con su tipo, id, direccion
 class directorioFunciones:
+    funciones = []
     def __init__(self):
         self.funciones = []
+
+    def __str__(self):
+        return self.funciones
 
 class EstrucFunc:
     def __init__(self, id, type, dir):

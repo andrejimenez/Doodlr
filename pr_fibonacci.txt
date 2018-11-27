@@ -1,0 +1,33 @@
+FUNCION INT fibo(INT n) {
+
+  INT i;
+  INT previous;
+  INT actual;
+  INT next;
+
+  i = 3;
+  previous = 1;
+  actual = 1;
+  next = 1;
+
+  WHILE(i <= n){
+    next = actual + previous;
+    previous = actual;
+    actual = next;
+    i = i + 1;
+  }
+  RETURN(next);
+}
+
+
+MAIN {
+
+  INT numero;
+  INT respuesta;
+
+  numero = 8;
+  respuesta = fibo(numero);
+
+  WRITE(respuesta);
+
+}

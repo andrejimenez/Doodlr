@@ -1,0 +1,35 @@
+GLOBAL INT add;
+GLOBAL INT var;
+GLOBAL INT var2;
+
+FUNCION INT fibo(INT n, INT i) {
+
+  IF (n > i){
+    IF(n == 0){
+      add = add + 1;
+    }
+    IF(n == 1){
+      add = add + 1;
+    }
+    ELSE{
+      var = fibo(n+1);
+      var2 = fibo(n+2);
+      add = var + var2;
+    }
+  }
+  RETURN(add);
+}
+
+
+MAIN {
+
+  add = 0;
+  INT n;
+  INT indice;
+  INT respuesta;
+
+  indice = 0;
+  n = 7;
+
+  respuesta = fibo(n, indice);
+}

@@ -74,7 +74,7 @@ cubo = {
         Operation.MINUS:"FLOAT",
         Operation.MULTIPLY:"FLOAT",
         Operation.DIVIDE:"FLOAT",
-        Operation.MODULE: "INT",
+        Operation.MODULE: "FLOAT",
         Operation.GREATER:"BOOL",
         Operation.GREATEREQUAL:"BOOL",
         Operation.LESSEQUAL:"BOOL",

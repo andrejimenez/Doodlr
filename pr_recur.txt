@@ -1,0 +1,25 @@
+GLOBAL INT add;
+
+FUNCION INT recur(INT n) {
+
+  WHILE(0 <= n){
+    add = add + n;
+    n = n -1;
+    recur(n);
+  }
+
+  RETURN(add);
+}
+
+
+MAIN {
+
+  add = 0;
+  INT x;
+  INT respuesta;
+
+  x = 2;
+
+  respuesta = recur(x);
+  WRITE (respuesta);
+}

@@ -1,0 +1,36 @@
+FUNCION INT intento(INT n) {
+  INT k;
+  INT p;
+
+  k = 10;
+  p = 20;
+
+  n = n + k + p;
+  RETURN (n);
+}
+
+MAIN  {
+  INT a;
+  INT b;
+  INT c;
+  INT respuesta;
+
+  a = 100;
+  b = 280;
+  c = 2;
+
+  RECTANGULO(a,b,c);
+
+
+  IF (c == 2) {
+    respuesta = intento(b);
+    b = 7;
+    c = 5;
+    CIRCULO(a,b,c);
+  }
+  ELSE {
+   respuesta = intento(a);
+  }
+  WRITE(respuesta);
+
+}

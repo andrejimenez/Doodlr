@@ -1,0 +1,25 @@
+FUNCION INT suma(INT nSuma){
+
+nSuma = nSuma + 1;
+RETURN(nSuma);
+}
+
+FUNCION INT resta(INT nResta){
+
+nResta = nResta - 1;
+RETURN(nResta);
+}
+
+MAIN{
+
+  INT numero;
+  INT a;
+  INT b;
+
+  numero = 5;
+  a = suma(numero);
+  b = resta(numero);
+
+  WRITE(a);
+  WRITE(b);
+}

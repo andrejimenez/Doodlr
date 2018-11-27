@@ -1,0 +1,21 @@
+FUNCION INT factorial(INT n){
+INT a;
+
+  IF(n == 0){
+    fact = 1;
+  }
+  ELSE {
+    n = n-1;
+    a = factorial(n);
+    a= a*n;
+    RETURN(a);
+  }
+}
+
+MAIN{
+  INT numero;
+  INT resultado;
+  numero = 0;
+
+  resultado = factorial(numero);
+}
